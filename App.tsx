@@ -5,114 +5,212 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import React, { useRef, useState } from "react";
+import { Animated, Dimensions, Image, PanResponder, StyleSheet, View } from "react-native";
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
+import LinearGradient from "react-native-linear-gradient";
+import { MatchScreen } from "./components/screen/MatchScreen.tsx";
+import { SearchScreen } from "./components/screen/SearchScreen.tsx";
+import { NewsScreen } from "./components/screen/NewsScreen.tsx";
+import { FavouriteScreen } from "./components/screen/FavouriteScreen.tsx";
+import { OtherScreen } from "./components/screen/OtherScreen.tsx";
+import { AnimatedUnderline, callUseEffectForUnderlineTab } from "./components/navbar/AnimatedUnderline.tsx";
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const Tab = createBottomTabNavigator();
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+function underlineTabIcon(select:string) {
+  const images = {
+    match: require("./assets/match_tab.png"),
+    search: require("./assets/search_tab.png"),
+    news : require("./assets/news_tab.png"),
+    favourite: require("./assets/favourite_tab.png"),
+    others: require("./assets/others_tab.png"),
+  };
+  switch (select) {
+    case 'match':
+      return (
+        <View>
+          <View>
+            <Image
+              style={iconStyles(20,15).icon}
+              source={images.match}
+            />
+          </View>
+        </View>
+      );
+    case 'search':
+      return (
+        <View>
+          <Image
+            style={iconStyles(20,20).icon}
+            source={images.search}
+          />
+        </View>
+      );
+    case 'news':
+      // setUnderline('news');
+      return (
+        <Image
+          style={iconStyles(20,20).icon}
+          source={images.news}
+        />
+      );
+    case 'favourite':
+      // setUnderline('favourite');
+      return (
+        <View>
+          <Image
+            style={iconStyles(20,20).icon}
+            source={images.favourite}
+          />
+        </View>
+
+      );
+    case 'others':
+      return (
+        <View>
+          <Image
+            style={iconStyles(4,15).icon}
+            source={images.others}
+          />
+        </View>
+      );
+    default:
+  }
 }
+
+function setStatePanX(panX: {}, setPanX: (value: (((prevState: {}) => {}) | {})) => void) {
+  setPanX(panX);
+}
+
+
+function setStatePanY(panY: {}, setPanY: (value: (((prevState: {}) => {}) | {})) => void) {
+  setPanY(panY);
+}
+
+
 
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
+  let pan = useRef(new Animated.ValueXY()).current;
+  let [underlineTabSelected,setUnderlineTabSelected] = useState('');
+  let {height} = Dimensions.get('window')
+  height = height - 60;
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <NavigationContainer>
+        <Tab.Navigator screenOptions={{
+          headerShown: false,
+          tabBarStyle: {
+            paddingTop: 8,
+            paddingBottom: 15,
+            height: 65
+          },
+          tabBarBackground:() => (
+            <LinearGradient colors={['#359DD9','#013A67']} style={{height:65}}/>
+          )
+        }} screenListeners={({route}) => ({ tabPress:() => {}
+        })} >
+          <Tab.Screen name="Pertandingan" component={MatchScreen} options={
+            {
+              tabBarLabelStyle: {
+                color: 'white'
+              },
+              tabBarIcon: ({}) => {
+                if(underlineTabSelected=='match') {
+                  callUseEffectForUnderlineTab(pan,{"x":0, "y":0})
+                }
+                return (
+                 underlineTabIcon('match')
+                )
+              }
+            }
+          } listeners={({route}) => ({ tabPress:() => {
+              setUnderlineTabSelected('match');
+            }
+          })}  />
+          <Tab.Screen name="Cari" component={SearchScreen} options={
+            {
+              tabBarLabelStyle: {
+                color: 'white'
+              },
+              tabBarIcon: ({}) => {
+                if(underlineTabSelected=='search') {
+                  callUseEffectForUnderlineTab(pan,{"x":85, "y":0})
+                }
+                return (
+                  underlineTabIcon('search')
+                )
+              }
+            }
+          } listeners={({route}) => ({ tabPress:() => {
+              setUnderlineTabSelected('search');
+            }
+          })} />
+          <Tab.Screen name="Berita" component={NewsScreen} options={
+            {
+              tabBarLabelStyle: {
+                color: 'white'
+              },
+              tabBarIcon: ({}) => {
+                if(underlineTabSelected=='news') {
+                  callUseEffectForUnderlineTab(pan,{"x":164, "y":0})
+                }
+                return underlineTabIcon('news')
+              }
+            }
+          } listeners={()=>({
+            tabPress : () => {
+              setUnderlineTabSelected('news');
+            }
+          })} />
+          <Tab.Screen name="Favorit" component={FavouriteScreen} options={
+            {
+              tabBarLabelStyle: {
+                color: 'white'
+              },
+              tabBarIcon: ({}) => {
+                if(underlineTabSelected=='favourite') {
+                  callUseEffectForUnderlineTab(pan,{"x":246, "y":0})
+                }
+                return underlineTabIcon('favourite')
+              }
+            }
+          } listeners={()=>({
+            tabPress: () => {
+              setUnderlineTabSelected('favourite');
+            }
+          })} />
+          <Tab.Screen name="Lainnya" component={OtherScreen} options={
+            {
+              tabBarLabelStyle: {
+                color: 'white'
+              },
+              tabBarIcon: ({}) => {
+                if(underlineTabSelected=='others') {
+                  callUseEffectForUnderlineTab(pan,{"x":328, "y":0})
+                }
+                return underlineTabIcon('others')
+              }
+            }
+          } listeners={()=>({
+            tabPress: () => {
+              setUnderlineTabSelected('others');
+            }
+          })}/>
+        </Tab.Navigator>
+        <AnimatedUnderline height={height} panX={pan.x} panY={pan.y} pan={pan}/>
+      </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+export const iconStyles = (width: number, height: number) => StyleSheet.create({
+  icon : {
+    width: width,
+    height:height
+  }
+})
+
 
 export default App;
+
