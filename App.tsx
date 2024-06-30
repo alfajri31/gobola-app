@@ -53,7 +53,7 @@ function underlineTabIcon(select:string) {
       // setUnderline('news');
       return (
         <Image
-          style={iconStyles(20,20).icon}
+          style={iconStyles(30,25).icon}
           source={images.news}
         />
       );

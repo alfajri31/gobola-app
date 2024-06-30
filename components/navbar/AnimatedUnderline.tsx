@@ -7,7 +7,7 @@ export function callUseEffectForUnderlineTab(previousPan: Animated.ValueXY,prevC
     useEffect(() => {
         Animated.timing(previousPan, {
             toValue: prevCoordinate,
-            duration: 400,
+            duration: 350,
             useNativeDriver: true,
         }).start();
     }, [previousPan]);
