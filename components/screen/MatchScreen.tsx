@@ -2,8 +2,8 @@ import { ActivityIndicator, FlatList, RefreshControl, Text, View } from "react-n
 import React, { useState } from "react";
 import { MatchItem } from "../../interface/MatchItem.ts";
 
-
 export function MatchScreen() {
+
   const [refreshing, setRefreshing] = useState(false);
   const page = 0;
   const pageSize = 5;
@@ -45,8 +45,8 @@ export function MatchScreen() {
   const renderItem = ({ item }: { item: MatchItem })=> (
     <View style={
       {
-        backgroundColor: 'black',
-        padding: 80,
+        backgroundColor: 'transparent',
+        padding: 80
       }
     }>
       <Text>{item.title}</Text>
@@ -67,7 +67,7 @@ export function MatchScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
         ListFooterComponent={
-          loadingMore ? <ActivityIndicator size="large" color="#0000ff" /> : null
+          loadingMore ? <ActivityIndicator size="large" color='#013A67' /> : null
         }
       />
     </View>
