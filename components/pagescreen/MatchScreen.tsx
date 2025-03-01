@@ -18,6 +18,7 @@ export function MatchScreen() {
   const startIndex = page * pageSize;
   const endIndex = page + pageSize;
 
+  //use effect init firebase
   useEffect(() => {
     // Listen for auth state changes
     const subscriber = auth().onAuthStateChanged(async (user) => {
@@ -45,6 +46,7 @@ export function MatchScreen() {
     // Unsubscribe from auth state changes when no longer in use
     return () => subscriber();
   }, [firebaseToken]);
+  //use firebase auth
   useEffect(() => {
     // Request permission to receive notifications
     messaging().requestPermission()
@@ -63,6 +65,7 @@ export function MatchScreen() {
     // Unsubscribe from FCM messages when no longer in use
     return () => messageListener();
   }, []);
+  //use effect received notification from firebase
   useEffect(() => {
     PushNotification.configure({
       onNotification: function (notification:any) {

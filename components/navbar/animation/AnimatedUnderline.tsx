@@ -16,6 +16,7 @@ export function callUseEffectForUnderlineTab(previousPan: Animated.ValueXY,prevC
     )
 }
 
+//for dynamic value style / animations
 export const AnimatedUnderline: React.FC<AnimatedUnderlineProps> = (
   { height, panX, panY,pan}) => {
     return(
