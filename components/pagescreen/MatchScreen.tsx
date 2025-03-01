@@ -18,20 +18,6 @@ export function MatchScreen() {
   const startIndex = page * pageSize;
   const endIndex = page + pageSize;
 
-  // useEffect(() => {
-  //   fetch('http://192.168.1.3:3001/matches?pageSize='+pageSize+
-  //     '&page='+page)
-  //     .then((response) => {
-  //       return response.json();
-  //     })
-  //     .then((data) => {
-  //       setFetchMatch(data)
-  //     })
-  //     .catch((error) => {
-  //       console.error('Error:', error);
-  //     });
-  // }, [apiReloaded]);
-
   useEffect(() => {
     // Listen for auth state changes
     const subscriber = auth().onAuthStateChanged(async (user) => {
@@ -45,8 +31,6 @@ export function MatchScreen() {
           console.log("FCM TOKEN :", fcmToken)
         });
       } else {
-        // // User is signed out, set token to null
-        // setFirebaseToken(null);
         try {
           const userCredential = await auth().createUserWithEmailAndPassword(
             "alfajri3112@gmail.com",
