@@ -1,7 +1,7 @@
 import { Animated, PanResponder, StyleSheet, View } from "react-native";
 import React, { useEffect, useRef } from "react";
-import { Coordinate } from "../interface/Coordinate.ts";
-import { AnimatedUnderlineProps } from "../interface/AnimatedUnderlineProps.tsx";
+import { Coordinate } from "../../interface/Coordinate.ts";
+import { AnimatedUnderlineProps } from "../../interface/AnimatedUnderlineProps.tsx";
 
 export function callUseEffectForUnderlineTab(previousPan: Animated.ValueXY,prevCoordinate:Coordinate) {
     useEffect(() => {
@@ -27,7 +27,7 @@ const underlineStyles = (height: number, panX: Animated.AnimatedValue, panY: Ani
     underline: {
         position: "absolute",
         left: 17,
-        top: height,
+        top: height+25,
         right: 0,
         width: 50,
         height:3,

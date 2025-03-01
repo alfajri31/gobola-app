@@ -1,10 +1,11 @@
 export type PageItem = {
   page : number,
-  size : number,
+  pageSize : number,
   data : MatchItem[]
 }
 
 export type MatchItem = {
   id : string
-  title : string
+  team : string
+  image : string
 }

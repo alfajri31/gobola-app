@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "304804376951",
-    "project_id": "gobola-300624",
-    "storage_bucket": "gobola-300624.appspot.com"
+    "project_number": "716624546372",
+    "project_id": "danamon-6f95d",
+    "storage_bucket": "danamon-6f95d.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:304804376951:android:a600da0f59735be819b172",
+        "mobilesdk_app_id": "1:716624546372:android:2a3a0a5138c9274b1d0a11",
         "android_client_info": {
           "package_name": "com.gobola"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCWc6hYSJ_Ehp0HZARZc966AUGc4gR8mSg"
+          "current_key": "AIzaSyDBs8RF32eqJQl4L4oYrkvqMwV3t2iJrPc"
         }
       ],
       "services": {

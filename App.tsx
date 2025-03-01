@@ -6,17 +6,17 @@
  */
 
 import React, { useRef, useState } from "react";
-import { Animated, Dimensions, Image, PanResponder, StyleSheet, View } from "react-native";
+import { Animated, Dimensions, Image, StyleSheet, View } from "react-native";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import LinearGradient from "react-native-linear-gradient";
-import { MatchScreen } from "./components/screen/MatchScreen.tsx";
-import { SearchScreen } from "./components/screen/SearchScreen.tsx";
-import { NewsScreen } from "./components/screen/NewsScreen.tsx";
-import { FavouriteScreen } from "./components/screen/FavouriteScreen.tsx";
-import { OtherScreen } from "./components/screen/OtherScreen.tsx";
-import { AnimatedUnderline, callUseEffectForUnderlineTab } from "./components/navbar/AnimatedUnderline.tsx";
+import { MatchScreen } from "./components/pagescreen/MatchScreen.tsx";
+import { SearchScreen } from "./components/pagescreen/SearchScreen.tsx";
+import { NewsScreen } from "./components/pagescreen/NewsScreen.tsx";
+import { FavouriteScreen } from "./components/pagescreen/FavouriteScreen.tsx";
+import { OtherScreen } from "./components/pagescreen/OtherScreen.tsx";
+import { AnimatedUnderline, callUseEffectForUnderlineTab } from "./components/navbar/animation/AnimatedUnderline.tsx";
 
 const Tab = createBottomTabNavigator();
 
@@ -85,18 +85,18 @@ function setStatePanX(panX: {}, setPanX: (value: (((prevState: {}) => {}) | {}))
   setPanX(panX);
 }
 
-
 function setStatePanY(panY: {}, setPanY: (value: (((prevState: {}) => {}) | {})) => void) {
   setPanY(panY);
 }
-
-
 
 function App(): React.JSX.Element {
   let pan = useRef(new Animated.ValueXY()).current;
   let [underlineTabSelected,setUnderlineTabSelected] = useState('');
   let {height} = Dimensions.get('window')
   height = height - 60;
+  /**
+   * push notification
+   */
   return (
       <NavigationContainer>
         <Tab.Navigator screenOptions={{
