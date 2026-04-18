@@ -1,12 +1,10 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gobola_app/match/detail/match_detail.dart';
 import 'package:gobola_app/service/match_service.dart';
 import 'package:gobola_app/theme/appcolors.dart';
+import 'package:gobola_app/toggles/switch_toggle.dart';
 import 'package:shimmer/shimmer.dart';
-import 'dart:async';
-
-
 
 class MatchScreen extends StatefulWidget {
   final MatchService matchService;
@@ -14,323 +12,325 @@ class MatchScreen extends StatefulWidget {
   const MatchScreen({super.key, required this.matchService});
 
   @override
-  State<StatefulWidget> createState() {
-    return Process();
-  }
+  State<MatchScreen> createState() => _MatchScreenState();
 }
 
-class Process extends State<MatchScreen> {
-  late Map<String, dynamic> matchData = {};
-  late Map<String, dynamic> liveCount = {};
-  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey();
-
+class _MatchScreenState extends State<MatchScreen> {
+  Map<String, dynamic> matchData = {};
+  Map<String, dynamic> liveCount = {};
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    fetchLiveCount();
     fetchApis();
   }
 
+  Future<void> fetchLiveCount() async {
+    try {
+      final data = await widget.matchService.fetchLiveCountDataApi();
+      if (!mounted) return;
 
-  Future<void> fetchApis() async {
-    //working api call in asynchronous in the background
-    // _timer = Timer.periodic(Duration(minutes: 1), (timer) async {
-    //
-    // });
-
-    widget.matchService
-        .fetchMatchDataApi(1, 10)
-        .then((fetchedData) {
-          setState(() {
-            matchData = fetchedData;
-          });
-          debugPrint('Fetched Data: $matchData');
-        })
-        .catchError((error) {
-          debugPrint('Error: $error');
-    });
-
-    widget.matchService
-        .fetchLiveCountDataApi()
-        .then((fetchedData) {
       setState(() {
-        liveCount = fetchedData;
+        liveCount = data;
       });
-      // debugPrint('Fetched Data: $matchData');
-    })
-        .catchError((error) {
-          debugPrint('Error: $error');
-    });
-
+    } catch (_) {}
   }
 
-  //
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  // }
+  Future<void> fetchApis() async {
+    setState(() => isLoading = true);
+
+    try {
+      final results = await Future.wait([
+        widget.matchService.fetchMatchDataApi(1, 10),
+        widget.matchService.fetchLiveCountDataApi(),
+      ]);
+
+      if (!mounted) return;
+
+      setState(() {
+        matchData = results[0];
+        liveCount = results[1];
+        isLoading = false;
+      });
+
+      // log di sini, jangan di build()
+      debugPrint('Match length: ${(matchData["data"] as List?)?.length ?? 0}');
+      debugPrint('Live count: ${liveCount["count"] ?? 0}');
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => isLoading = false);
+      debugPrint('Error: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    /*
-    since this variable matchData set by asynchronous and it can be null
-    because the result still in progress, but because the api call use 'then' it will return the value
-     */
-    debugPrint(
-      'Fetched Data: ${matchData['data']?.length ?? 'loading match...'}',
+    final List dataList = (matchData['data'] as List?) ?? [];
+    final int live = (liveCount["count"] as int?) ?? 0;
+
+    return Scaffold(body: _buildListVIew(live, dataList));
+  }
+
+  Widget _buildListVIew(live, dataList) {
+    return Column(
+      children: [
+        _Header(live: live),
+        Expanded(
+          child: ListView.builder(
+            padding: EdgeInsets.zero,
+            itemCount: isLoading ? 6 : dataList.length,
+            itemBuilder: (context, index) {
+              if (isLoading) {
+                return const _ShimmerCard();
+              }
+              final Map<String, dynamic> data =
+                  dataList[index] as Map<String, dynamic>;
+              return MatchCard(data: data);
+            },
+          ),
+        ),
+      ],
     );
-    debugPrint(
-      'Fetched Data: ${liveCount['count'] ?? 'loading live count...'}',
-    );
-    return MaterialApp(
-      home: Scaffold(
-        body: Column(
+  }
+}
+
+class _Header extends StatelessWidget {
+  final int live;
+
+  const _Header({required this.live});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 120.0,
+      child: DecoratedBox(
+        decoration: BoxDecoration(gradient: AppColors.bottomNavigationBarColor),
+        child: Row(
           children: [
-            SizedBox(
-              width: double.infinity,
-              height: 120.0,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: AppColors.bottomNavigationBarColor,
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 20),
-                    Text(
-                      "eBola",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(width: 180),
-                    Text(
-                      "Live (${liveCount["count"] ?? 0})",
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
+            SizedBox(width: 20),
+            Text(
+              "eBola",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 32,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            Expanded(
-              child: Container(
-                // color: Colors.red,
-                color: Colors.transparent,
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    //api response
-                    Expanded(
-                      child: ListView.builder(
-                        padding: EdgeInsets.zero,
-                        itemCount: matchData['data']?.length,
-                        itemBuilder: (context, index) {
-                          int size =
-                              matchData.isNotEmpty
-                                  ? matchData['data']?.length
-                                  : 0;
-                          if (size > 0) {
-                            Map<String, dynamic> data =
-                                matchData['data']?[index];
-                            return Column(
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  height: 38,
-                                  color: AppColors.darkBlue,
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(vertical: 9),
-                                    child: Row(
-                                      children: [
-                                        const SizedBox(width: 10),
-                                        Image.network(
-                                          data["image"],
-                                          width: 20,
-                                          height: 20,
-                                          loadingBuilder: (
-                                            context,
-                                            child,
-                                            progress,
-                                          ) {
-                                            if (progress == null) {
-                                              return child;
-                                            }
-                                            return Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            );
-                                          },
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Text(
-                                          data['league'],
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 10),
-                                  // color: Colors.yellow,
-                                  color: Colors.transparent,
-                                  alignment: Alignment.topLeft,
-                                  child: Text(data["round"]),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(top: 10),
-                                  child: SizedBox(
-                                    height: 100,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          //time
-                                          child: Container(
-                                            // color: Colors.green,
-                                            color: AppColors.softGrey,
-                                            height: double.infinity,
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              data['teams']['times'],
-                                              style: TextStyle(
-                                                color: AppColors.darkYellow,
-                                                fontWeight: FontWeight.w800,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          //team 1
-                                          child: Container(
-                                            // color: Colors.purple,
-                                            color: AppColors.softGrey,
-                                            height: double.infinity,
-                                            child: Image.network(
-                                              data["match"][0]["image"],
-                                              width: 30,
-                                              height: 30,
-                                              loadingBuilder: (
-                                                context,
-                                                child,
-                                                progress,
-                                              ) {
-                                                if (progress == null) {
-                                                  return child;
-                                                }
-                                                return Center(
-                                                  child:
-                                                      CircularProgressIndicator(),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          //vs
-                                          child: Container(
-                                            color: Colors.transparent,
-                                            height: double.infinity,
-                                            // padding: EdgeInsets.symmetric(
-                                            //   vertical: 6,
-                                            // ), // Top & bottom only
-                                            child: DecoratedBox(
-                                              decoration: BoxDecoration(
-                                                gradient:
-                                                    AppColors
-                                                        .bottomNavigationBarColor,
-                                              ),
-                                              child: Container(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  "${data['match'][0]['score']} - ${data['match'][1]['score']}",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 22,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          //team 2
-                                          child: Container(
-                                            // color: Colors.purple,
-                                            color: AppColors.softGrey,
-                                            height: double.infinity,
-                                            child: Image.network(
-                                              data["match"][1]["image"],
-                                              width: 30,
-                                              height: 30,
-                                              loadingBuilder: (
-                                                context,
-                                                child,
-                                                progress,
-                                              ) {
-                                                if (progress == null) {
-                                                  return child;
-                                                }
-                                                return Center(
-                                                  child:
-                                                      CircularProgressIndicator(),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          //favorite
-                                          child: Container(
-                                            // color: Colors.green,
-                                            color: AppColors.softGrey,
-                                            height: double.infinity,
-                                            child: IconButton(
-                                              onPressed: () {},
-                                              icon: FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                child: SvgPicture.asset(
-                                                  "lib/assets/icons/favorite.svg",
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }
-                          return Shimmer.fromColors(
-                            baseColor: Colors.grey.shade300,
-                            highlightColor: Colors.grey.shade100,
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                vertical: 8.0,
-                                horizontal: 16.0,
-                              ),
-                              height: 150, // Height of your widget
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+            Spacer(),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Transform.translate(
+                  offset: const Offset(10, 0),
+                  child: Text(
+                    "Live ($live)",
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
-              ),
+                SwitchToggle(),
+              ],
             ),
+            // teks live di bawah pakai builder biar const tetap dipakai? kita bikin non-const:
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Match card dipisah supaya build utama lebih ringan & rapi
+class MatchCard extends StatefulWidget {
+  final Map<String, dynamic> data;
+
+  const MatchCard({super.key, required this.data});
+
+  @override
+  State<MatchCard> createState() => _SwitchMatchCard();
+}
+
+class _SwitchMatchCard extends State<MatchCard> {
+  bool isMatchDetail = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final String league = (widget.data['league'] ?? '') as String;
+    final String leagueImage = (widget.data['image'] ?? '') as String;
+    final String round = (widget.data['round'] ?? '') as String;
+
+    final Map teams = (widget.data['teams'] as Map?) ?? {};
+    final String times = (teams['times'] ?? '') as String;
+
+    final List match = (widget.data['match'] as List?) ?? [];
+    final Map m1 = match.isNotEmpty ? (match[0] as Map) : {};
+    final Map m2 = match.length > 1 ? (match[1] as Map) : {};
+
+    final String img1 = (m1['image'] ?? '') as String;
+    final String img2 = (m2['image'] ?? '') as String;
+
+    final int s1 = (m1['score'] as int?) ?? 0;
+    final int s2 = (m2['score'] as int?) ?? 0;
+
+    return Column(
+      children: [
+        // League Header
+        Container(
+          width: double.infinity,
+          height: 38,
+          color: AppColors.darkBlue,
+          padding: const EdgeInsets.symmetric(vertical: 9),
+          child: Row(
+            children: [
+              const SizedBox(width: 10),
+              _NetImage(url: leagueImage, size: 20),
+              const SizedBox(width: 10),
+              Text(league, style: const TextStyle(color: Colors.white)),
+            ],
+          ),
+        ),
+
+        // Round
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          alignment: Alignment.topLeft,
+          child: Text(round),
+        ),
+
+        // Row Match
+        Container(
+          padding: const EdgeInsets.only(top: 10),
+          child: SizedBox(
+            height: 100,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    color: AppColors.softGrey,
+                    alignment: Alignment.center,
+                    child: Text(
+                      times,
+                      style: TextStyle(
+                        color: AppColors.darkYellow,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    color: AppColors.softGrey,
+                    alignment: Alignment.center,
+                    child: _NetImage(url: img1, size: 30),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => Scaffold(
+                                body: MatchDetail(),
+                                bottomNavigationBar:
+                                    null // inject lagi
+                              ),
+                        ),
+                      );
+                    },
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: AppColors.bottomNavigationBarColor,
+                      ),
+                      child: Center(
+                        child: Text(
+                          "$s1 - $s2",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    color: AppColors.softGrey,
+                    alignment: Alignment.center,
+                    child: _NetImage(url: img2, size: 30),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    color: AppColors.softGrey,
+                    alignment: Alignment.center,
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: SvgPicture.asset(
+                        "lib/assets/icons/favorite.svg",
+                        width: 20,
+                        height: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Image loader ringan (tanpa spinner) -> lebih hemat render
+class _NetImage extends StatelessWidget {
+  final String url;
+  final double size;
+
+  const _NetImage({required this.url, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    if (url.isEmpty) {
+      return SizedBox(width: size, height: size);
+    }
+
+    return Image.network(
+      url,
+      width: size,
+      height: size,
+      fit: BoxFit.contain,
+      // Placeholder ringan biar list gak berat
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return SizedBox(width: size, height: size);
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return SizedBox(width: size, height: size);
+      },
+    );
+  }
+}
+
+class _ShimmerCard extends StatelessWidget {
+  const _ShimmerCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        height: 150,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
     );

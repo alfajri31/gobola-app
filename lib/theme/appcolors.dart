@@ -7,6 +7,7 @@ class AppColors {
   static Color darkBlue = HexColor("#013A67");
   static Color softGrey = HexColor("F9F9F9");
   static Color darkYellow = HexColor("#FFCC00");
+  static Color tosca = HexColor("#00B0A6");
 
   static final LinearGradient topNavigationBarColor= LinearGradient(
     colors: [primaryColor,secondaryColor],
