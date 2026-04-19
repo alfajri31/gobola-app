@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../theme/appcolors.dart';
 
 class MyNavigation extends StatefulWidget {
-
   final double underlineX;
   final void Function(int index) selectedMenu;
   final GlobalKey myKey1;

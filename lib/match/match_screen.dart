@@ -60,7 +60,6 @@ class _MatchScreenState extends State<MatchScreen> {
       debugPrint('Live count: ${liveCount["count"] ?? 0}');
     } catch (e) {
       if (!mounted) return;
-      setState(() => isLoading = false);
       debugPrint('Error: $e');
     }
   }
@@ -78,18 +77,13 @@ class _MatchScreenState extends State<MatchScreen> {
       children: [
         _Header(live: live),
         Expanded(
-          child: ListView.builder(
-            padding: EdgeInsets.zero,
-            itemCount: isLoading ? 6 : dataList.length,
-            itemBuilder: (context, index) {
-              if (isLoading) {
-                return const _ShimmerCard();
-              }
-              final Map<String, dynamic> data =
-                  dataList[index] as Map<String, dynamic>;
-              return MatchCard(data: data);
-            },
-          ),
+          child:
+              isLoading
+                  ? const ShimmerList()
+                  : ListView.builder(
+                    itemCount: dataList.length,
+                    itemBuilder: (_, i) => MatchCard(data: dataList[i]),
+                  ),
         ),
       ],
     );
@@ -234,8 +228,7 @@ class _SwitchMatchCard extends State<MatchCard> {
                           builder:
                               (_) => Scaffold(
                                 body: MatchDetail(),
-                                bottomNavigationBar:
-                                    null // inject lagi
+                                bottomNavigationBar: null, // inject lagi
                               ),
                         ),
                       );
@@ -317,21 +310,26 @@ class _NetImage extends StatelessWidget {
   }
 }
 
-class _ShimmerCard extends StatelessWidget {
-  const _ShimmerCard();
+class ShimmerList extends StatelessWidget {
+  const ShimmerList({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade300,
       highlightColor: Colors.grey.shade100,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        height: 150,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-        ),
+      child: ListView.builder(
+        padding: EdgeInsets.zero,
+        itemCount: 6,
+        itemBuilder:
+            (_, __) => Container(
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              height: 150,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
       ),
     );
   }
