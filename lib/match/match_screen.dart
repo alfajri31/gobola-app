@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gobola_app/match/detail/match_detail.dart';
@@ -19,12 +21,18 @@ class _MatchScreenState extends State<MatchScreen> {
   Map<String, dynamic> matchData = {};
   Map<String, dynamic> liveCount = {};
   bool isLoading = true;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    fetchLiveCount();
-    fetchApis();
+    _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if(isLoading) {
+        fetchLiveCount();
+        fetchApis();
+      }
+    });
+
   }
 
   Future<void> fetchLiveCount() async {
@@ -39,6 +47,7 @@ class _MatchScreenState extends State<MatchScreen> {
   }
 
   Future<void> fetchApis() async {
+
     setState(() => isLoading = true);
 
     try {
