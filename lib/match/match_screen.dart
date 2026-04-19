@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gobola_app/match/detail/match_detail.dart';
+import 'package:gobola_app/navigation/my_navigation.dart';
 import 'package:gobola_app/service/match_service.dart';
 import 'package:gobola_app/theme/appcolors.dart';
 import 'package:gobola_app/toggles/switch_toggle.dart';
@@ -27,12 +28,11 @@ class _MatchScreenState extends State<MatchScreen> {
   void initState() {
     super.initState();
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
-      if(isLoading) {
+      if (isLoading) {
         fetchLiveCount();
         fetchApis();
       }
     });
-
   }
 
   Future<void> fetchLiveCount() async {
@@ -47,7 +47,6 @@ class _MatchScreenState extends State<MatchScreen> {
   }
 
   Future<void> fetchApis() async {
-
     setState(() => isLoading = true);
 
     try {
@@ -237,7 +236,9 @@ class _SwitchMatchCard extends State<MatchCard> {
                           builder:
                               (_) => Scaffold(
                                 body: MatchDetail(),
-                                bottomNavigationBar: null, // inject lagi
+                                bottomNavigationBar: MyNavigation(
+                                  stay: true,
+                                ), // inject lagi
                               ),
                         ),
                       );
