@@ -20,7 +20,8 @@ Catatan pembelajaran selama latihan Flutter:
 12. Jika ingin cepat mengganti asset, gunakan `Text` sebagai placeholder sebelum diganti dengan asset asli.
 13. Jika ingin child memiliki lebar dan tinggi sama dengan parent, gunakan `Positioned.fill()`.
 14. Jika ingin membungkus widget secara otomatis di Android Studio, tekan `Alt + Enter`, lalu pilih parent/wrapper yang diinginkan.
-
+15. Jika menggunakan DTO, maka cara mengakses datanya menggunakan property, contoh: `widget.data?.league` (jika field tersebut bernama `league` di dalam object `data`).
+16. Jika menggunakan response API tanpa DTO (masih berupa `Map<String, dynamic>`), maka cara mengaksesnya menggunakan key, contoh: `widget.data['league']` (jika `league` berada di dalam property `data`).
 ---
 
 ## 💡 Notes

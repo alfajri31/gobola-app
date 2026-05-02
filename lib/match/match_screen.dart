@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gobola_app/dto/MatchResponse.dart';
 import 'package:gobola_app/match/detail/match_detail_screen.dart';
 import 'package:gobola_app/navigation/my_navigation.dart';
 import 'package:gobola_app/service/match_service.dart';
 import 'package:gobola_app/theme/appcolors.dart';
 import 'package:gobola_app/toggles/switch_toggle.dart';
 import 'package:shimmer/shimmer.dart';
+
+import '../dto/MatchItem.dart';
 
 class MatchScreen extends StatefulWidget {
   final MatchService matchService;
@@ -19,7 +22,7 @@ class MatchScreen extends StatefulWidget {
 }
 
 class _MatchScreenState extends State<MatchScreen> {
-  Map<String, dynamic> matchData = {};
+  MatchResponse? matchData;
   Map<String, dynamic> liveCount = {};
   bool isLoading = true;
   Timer? _timer;
@@ -58,14 +61,12 @@ class _MatchScreenState extends State<MatchScreen> {
       if (!mounted) return;
 
       setState(() {
-        matchData = results[0];
-        liveCount = results[1];
+        matchData = results[0] as MatchResponse;
         isLoading = false;
       });
 
       // log di sini, jangan di build()
-      debugPrint('Match length: ${(matchData["data"] as List?)?.length ?? 0}');
-      debugPrint('Live count: ${liveCount["count"] ?? 0}');
+      debugPrint('Match length: ${matchData?.data.length ?? 0}');
     } catch (e) {
       if (!mounted) return;
       debugPrint('Error: $e');
@@ -74,7 +75,7 @@ class _MatchScreenState extends State<MatchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List dataList = (matchData['data'] as List?) ?? [];
+    final List<MatchItem> dataList = matchData?.data ?? [];
     final int live = (liveCount["count"] as int?) ?? 0;
 
     return Scaffold(body: _buildListVIew(live, dataList));
@@ -145,7 +146,7 @@ class _Header extends StatelessWidget {
 
 /// Match card dipisah supaya build utama lebih ringan & rapi
 class MatchCard extends StatefulWidget {
-  final Map<String, dynamic> data;
+  final MatchItem? data;
 
   const MatchCard({super.key, required this.data});
 
@@ -158,23 +159,25 @@ class _SwitchMatchCard extends State<MatchCard> {
 
   @override
   Widget build(BuildContext context) {
-    final String league = (widget.data['league'] ?? '') as String;
-    final String leagueImage = (widget.data['image'] ?? '') as String;
-    final String round = (widget.data['round'] ?? '') as String;
+    final String league = widget.data?.league ?? '';
+    final String leagueImage = widget.data?.image ?? '';
+    final String round = widget.data?.round ?? '';
 
-    final Map teams = (widget.data['teams'] as Map?) ?? {};
-    final String times = (teams['times'] ?? '') as String;
+    final String times = widget.data?.teams.times ?? '';
 
-    final List match = (widget.data['match'] as List?) ?? [];
-    final Map m1 = match.isNotEmpty ? (match[0] as Map) : {};
-    final Map m2 = match.length > 1 ? (match[1] as Map) : {};
+    final String img1 =
+        widget.data?.match.isNotEmpty == true
+            ? widget.data!.match[0].image
+            : '';
 
-    final String img1 = (m1['image'] ?? '') as String;
-    final String img2 = (m2['image'] ?? '') as String;
+    final String img2 =
+        widget.data?.match.length == 2 ? widget.data!.match[1].image : '';
 
-    final int s1 = (m1['score'] as int?) ?? 0;
-    final int s2 = (m2['score'] as int?) ?? 0;
+    final int s1 =
+        widget.data?.match.isNotEmpty == true ? widget.data!.match[0].score : 0;
 
+    final int s2 =
+        widget.data?.match.length == 2 ? widget.data!.match[1].score : 0;
     return Column(
       children: [
         // League Header
