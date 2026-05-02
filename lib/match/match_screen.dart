@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:gobola_app/match/detail/match_detail.dart';
+import 'package:gobola_app/match/detail/match_detail_screen.dart';
 import 'package:gobola_app/navigation/my_navigation.dart';
 import 'package:gobola_app/service/match_service.dart';
 import 'package:gobola_app/theme/appcolors.dart';
@@ -106,7 +106,7 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity,
+      // width: double.infinity,
       height: 120.0,
       child: DecoratedBox(
         decoration: BoxDecoration(gradient: AppColors.bottomNavigationBarColor),
@@ -235,9 +235,10 @@ class _SwitchMatchCard extends State<MatchCard> {
                         MaterialPageRoute(
                           builder:
                               (_) => Scaffold(
-                                body: MatchDetail(),
+                                body: MatchDetailScreen(),
                                 bottomNavigationBar: MyNavigation(
                                   stay: true,
+                                  page: MatchDetailScreen(),
                                 ), // inject lagi
                               ),
                         ),

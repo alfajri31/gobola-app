@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:gobola_app/HttpOverride.dart';
 import 'package:gobola_app/match/match_screen.dart';
 import 'package:gobola_app/navigation/my_navigation.dart';
 import 'package:gobola_app/news/news_screen.dart';
@@ -8,6 +11,7 @@ import 'package:gobola_app/service/match_service.dart';
 import 'favourite/favorite_screen.dart';
 
 void main() {
+  HttpOverrides.global = HttpOverride();
   runApp(const MyApp());
 }
 
@@ -25,6 +29,7 @@ class Process extends State<MyApp> {
     return Scaffold(
       bottomNavigationBar: MyNavigation(
         stay: false,
+        page: MyApp()
       ),
     );
   }

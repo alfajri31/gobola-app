@@ -12,8 +12,9 @@ import '../theme/appcolors.dart';
 
 class MyNavigation extends StatefulWidget {
   final bool stay;
+  final Widget page;
 
-  const MyNavigation({super.key, required this.stay});
+  const MyNavigation({super.key, required this.stay, required this.page});
 
   @override
   State<StatefulWidget> createState() => MyNavigationState();
@@ -76,7 +77,7 @@ class MyNavigationState extends State<MyNavigation> {
 
     return Scaffold(
       // body: widget.isStay ? pages[dynamicIndex] : SizedBox(),
-      body: !stay ? pages[dynamicIndex] : SizedBox(),
+      body: !stay ? pages[dynamicIndex] : widget.page,
       bottomNavigationBar: Transform.translate(
         offset: Offset(0, 25),
         child: Container(
