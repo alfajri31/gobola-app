@@ -5,7 +5,6 @@ import '../config/config.dart';
 import '../dto/MatchResponse.dart';
 
 class MatchService {
-
   Future<MatchResponse> fetchMatchDataApi(int page, int size) async {
     final url = Uri.parse('${AppConfig.baseUrl}/match');
 
@@ -41,13 +40,16 @@ class MatchService {
     try {
       final response = await http.post(url, headers: headers, body: body);
       if (response.statusCode == 200) {
-        return json.decode(response.body);  // Return decoded response when successful
+        return json.decode(
+          response.body,
+        ); // Return decoded response when successful
       } else {
-        throw Exception('Failed to load data: ${response.statusCode}');  // Throw error if status code is not 200
+        throw Exception(
+          'Failed to load data: ${response.statusCode}',
+        ); // Throw error if status code is not 200
       }
     } catch (e) {
       rethrow;
     }
   }
-
 }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gobola_app/dto/MatchResponse.dart';
 import 'package:gobola_app/match/detail/match_detail_screen.dart';
-import 'package:gobola_app/navigation/my_navigation.dart';
+import 'package:gobola_app/utility/my_navigation.dart';
 import 'package:gobola_app/service/match_service.dart';
 import 'package:gobola_app/theme/appcolors.dart';
 import 'package:gobola_app/toggles/switch_toggle.dart';

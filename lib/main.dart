@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gobola_app/HttpOverride.dart';
 import 'package:gobola_app/match/match_screen.dart';
-import 'package:gobola_app/navigation/my_navigation.dart';
+import 'package:gobola_app/utility/my_navigation.dart';
 import 'package:gobola_app/news/news_screen.dart';
 import 'package:gobola_app/other/others_screen.dart';
 import 'package:gobola_app/search/search_screen.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../navigation/header.dart';
+import '../../utility/header.dart';
 
 class MatchDetailScreen extends StatelessWidget {
   const MatchDetailScreen({super.key});

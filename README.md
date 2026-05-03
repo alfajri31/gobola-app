@@ -6,7 +6,7 @@ A Flutter project for learning and practicing UI layout concepts.
 
 Catatan pembelajaran selama latihan Flutter:
 
-1. Kalau ingin punya jarak seperti m-auto, gunakan `Spacer()`.
+1. Kalau ingin punya jarak antar widget seperti m-auto antar element (seperti: row/colum), gunakan `Spacer()`.
 2. Kalau ingin tampilan bersifat absolut (bertumpuk), gunakan `Stack`.
 3. Jika ingin mengatur posisi bebas di dalam Stack, gunakan `Positioned()` (bukan Stack-nya, tapi isi widget-nya).
 4. Jika menggunakan `setState`, maka gunakan `StatefulWidget`.
